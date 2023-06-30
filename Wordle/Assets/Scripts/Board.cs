@@ -34,6 +34,8 @@ public class Board : MonoBehaviour
     public Button newWordButton;
     public Button tryAgainButton;
 
+    private Button letterButtons;
+
     private void Awake() 
     {
         rows = GetComponentsInChildren<Row>();
@@ -77,36 +79,36 @@ public class Board : MonoBehaviour
 
     private void Update()
     {
-        Row currentRow = rows[rowIndex];
+        // Row currentRow = rows[rowIndex];
 
-        if (Input.GetKeyDown(KeyCode.Backspace))
-        {
-            columnIndex = Mathf.Max(columnIndex - 1, 0);
-            currentRow.tiles[columnIndex].SetLetter('\0');
-            currentRow.tiles[columnIndex].SetState(emptyState);
+        // if (Input.GetKeyDown(KeyCode.Backspace))
+        // {
+        //     columnIndex = Mathf.Max(columnIndex - 1, 0);
+        //     currentRow.tiles[columnIndex].SetLetter('\0');
+        //     currentRow.tiles[columnIndex].SetState(emptyState);
 
-            invalidWordText.gameObject.SetActive(false);
-        }
-        else if (columnIndex >= currentRow.tiles.Length) 
-        {
-            if (Input.GetKeyDown(KeyCode.Return))
-            {
-                SubmitRow(currentRow);
-            }
-        }
-        else
-        {
-            for (int i = 0; i < SUPPORTED_KEYS.Length; i++)
-            {
-                if (Input.GetKeyDown(SUPPORTED_KEYS[i]))
-                {
-                    currentRow.tiles[columnIndex].SetLetter((char)SUPPORTED_KEYS[i]);
-                    currentRow.tiles[columnIndex].SetState(occupiedState);
-                    columnIndex++;
-                    break;
-                }
-            }
-        }
+        //     invalidWordText.gameObject.SetActive(false);
+        // }
+        // else if (columnIndex >= currentRow.tiles.Length) 
+        // {
+        //     if (Input.GetKeyDown(KeyCode.Return))
+        //     {
+        //         SubmitRow(currentRow);
+        //     }
+        // }
+        // else
+        // {
+        //     for (int i = 0; i < SUPPORTED_KEYS.Length; i++)
+        //     {
+        //         if (Input.GetKeyDown(SUPPORTED_KEYS[i]))
+        //         {
+        //             currentRow.tiles[columnIndex].SetLetter((char)SUPPORTED_KEYS[i]);
+        //             currentRow.tiles[columnIndex].SetState(occupiedState);
+        //             columnIndex++;
+        //             break;
+        //         }
+        //     }
+        // }
     }
 
     private void SubmitRow(Row row)
@@ -218,5 +220,62 @@ public class Board : MonoBehaviour
     {
         tryAgainButton.gameObject.SetActive(true);
         newWordButton.gameObject.SetActive(true);
+    }
+
+    public void OnLetterButtonClick(Button button) {
+
+        Row currentRow = rows[rowIndex];
+        currentRow.tiles[columnIndex].SetLetter((char) button.GetComponentInChildren<Text>().text[0]);
+
+
+        if (Input.GetKeyDown(KeyCode.Backspace))
+        {
+            columnIndex = Mathf.Max(columnIndex - 1, 0);
+            currentRow.tiles[columnIndex].SetLetter('\0');
+            currentRow.tiles[columnIndex].SetState(emptyState);
+
+            invalidWordText.gameObject.SetActive(false);
+        }
+        else if (columnIndex >= currentRow.tiles.Length) 
+        {
+            if (Input.GetKeyDown(KeyCode.Return))
+            {
+                SubmitRow(currentRow);
+            }
+        }
+        else
+        {
+            for (int i = 0; i < SUPPORTED_KEYS.Length; i++)
+            {
+                if (Input.GetKeyDown(SUPPORTED_KEYS[i]))
+                {
+                    currentRow.tiles[columnIndex].SetLetter((char)SUPPORTED_KEYS[i]);
+                    currentRow.tiles[columnIndex].SetState(occupiedState);
+                    columnIndex++;
+                    break;
+                }
+            }
+        }
+    }
+
+    public void GetButtonClick(Button letterButtons)
+    {
+        Row currentRow = rows[rowIndex];
+        string buttonText = letterButtons.GetComponentInChildren<TextMeshProUGUI>().text;
+
+        if (buttonText == "<<<") 
+        {
+            columnIndex = Mathf.Max(columnIndex - 1, 0);
+            currentRow.tiles[columnIndex].SetLetter('\0');
+            currentRow.tiles[columnIndex].SetState(emptyState);
+
+            invalidWordText.gameObject.SetActive(false);
+        }
+        else
+        {
+            currentRow.tiles[columnIndex].SetLetter((char)buttonText[0]);
+            currentRow.tiles[columnIndex].SetState(occupiedState);
+            columnIndex++;
+        }
     }
 }
