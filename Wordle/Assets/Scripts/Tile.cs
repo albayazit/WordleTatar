@@ -15,8 +15,8 @@ public class Tile : MonoBehaviour
     public char letter { get; private set; }
 
     private TextMeshProUGUI text;
-    private Image fill;
-    private Outline outline;
+    public Image fill;
+    public Outline outline;
 
     private void Awake() {
         text = GetComponentInChildren<TextMeshProUGUI>();

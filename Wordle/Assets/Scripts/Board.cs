@@ -36,6 +36,13 @@ public class Board : MonoBehaviour
 
     private Button letterButtons;
 
+    public Color defaultKeyColor;
+    public Color wrongKeyColor;
+    public Color incorrectKeyColor;
+    public Color correctKeyColor;
+
+    public Button[] allButtons;
+
     private void Awake() 
     {
         rows = GetComponentsInChildren<Row>();
@@ -159,6 +166,8 @@ public class Board : MonoBehaviour
             }
         }
 
+        SetButtonColor(row);
+        
         if (HasWon(row)) {
             enabled = false; 
         }
@@ -172,6 +181,32 @@ public class Board : MonoBehaviour
         }
     }
 
+    private void SetButtonColor(Row row)
+    {
+        for (int i = 0; i < row.tiles.Length; i++)
+        {
+            Tile tile = row.tiles[i];
+            for (int j = 0; j < allButtons.Length; j++)
+            {
+                if (allButtons[j].GetComponentInChildren<TextMeshProUGUI>().text[0] == tile.letter)
+                {
+                    if (tile.state == wrongState && allButtons[j].image.color != correctKeyColor)
+                    {
+                        allButtons[j].image.color = wrongKeyColor;
+                    }
+                    else if (tile.state == incorrectState)
+                    {
+                        allButtons[j].image.color = incorrectKeyColor;
+                    }
+                    else if (tile.state == correctState)
+                    {
+                        allButtons[j].image.color = correctKeyColor;
+                    }
+                }
+            }
+        }
+    }
+
     private void ClearBoard()
     {
         for (int row = 0; row < rows.Length; row++)
@@ -181,6 +216,11 @@ public class Board : MonoBehaviour
                 rows[row].tiles[col].SetLetter('\0');
                 rows[row].tiles[col].SetState(emptyState);
             }
+        }
+
+        for (int j = 0; j < allButtons.Length; j++)
+        {
+            allButtons[j].image.color = defaultKeyColor;
         }
 
         rowIndex = 0;
