@@ -70,45 +70,45 @@ public class Board : MonoBehaviour
 
     private void LoadData() 
     {
-        TextAsset textFile = Resources.Load("official_wordle_all") as TextAsset;
+        TextAsset textFile = Resources.Load("TatarWords/common") as TextAsset;
         validWords = textFile.text.Split('\n');
 
-        textFile = Resources.Load("official_wordle_common") as TextAsset;
+        textFile = Resources.Load("TatarWords/common") as TextAsset;
         solutions = textFile.text.Split('\n');
     }
 
     private void Update()
     {
-        // Row currentRow = rows[rowIndex];
+        Row currentRow = rows[rowIndex];
 
-        // if (Input.GetKeyDown(KeyCode.Backspace))
-        // {
-        //     columnIndex = Mathf.Max(columnIndex - 1, 0);
-        //     currentRow.tiles[columnIndex].SetLetter('\0');
-        //     currentRow.tiles[columnIndex].SetState(emptyState);
+        if (Input.GetKeyDown(KeyCode.Backspace))
+        {
+            columnIndex = Mathf.Max(columnIndex - 1, 0);
+            currentRow.tiles[columnIndex].SetLetter('\0');
+            currentRow.tiles[columnIndex].SetState(emptyState);
 
-        //     invalidWordText.gameObject.SetActive(false);
-        // }
-        // else if (columnIndex >= currentRow.tiles.Length) 
-        // {
-        //     if (Input.GetKeyDown(KeyCode.Return))
-        //     {
-        //         SubmitRow(currentRow);
-        //     }
-        // }
-        // else
-        // {
-        //     for (int i = 0; i < SUPPORTED_KEYS.Length; i++)
-        //     {
-        //         if (Input.GetKeyDown(SUPPORTED_KEYS[i]))
-        //         {
-        //             currentRow.tiles[columnIndex].SetLetter((char)SUPPORTED_KEYS[i]);
-        //             currentRow.tiles[columnIndex].SetState(occupiedState);
-        //             columnIndex++;
-        //             break;
-        //         }
-        //     }
-        // }
+            invalidWordText.gameObject.SetActive(false);
+        }
+        else if (columnIndex >= currentRow.tiles.Length) 
+        {
+            if (Input.GetKeyDown(KeyCode.Return))
+            {
+                SubmitRow(currentRow);
+            }
+        }
+        else
+        {
+            for (int i = 0; i < SUPPORTED_KEYS.Length; i++)
+            {
+                if (Input.GetKeyDown(SUPPORTED_KEYS[i]))
+                {
+                    currentRow.tiles[columnIndex].SetLetter((char)SUPPORTED_KEYS[i]);
+                    currentRow.tiles[columnIndex].SetState(occupiedState);
+                    columnIndex++;
+                    break;
+                }
+            }
+        }
     }
 
     private void SubmitRow(Row row)
@@ -125,14 +125,14 @@ public class Board : MonoBehaviour
         {
             Tile tile = row.tiles[i];
 
-            if (tile.letter == word[i])
+            if (char.ToLower(tile.letter) == word[i])
             {
                 tile.SetState(correctState);
 
                 remaining = remaining.Remove(i, 1);
                 remaining = remaining.Insert(i, " ");
             }
-            else if (!word.Contains(tile.letter))
+            else if (!word.Contains(char.ToLower(tile.letter)))
             {
                 tile.SetState(incorrectState);
             }
@@ -144,11 +144,11 @@ public class Board : MonoBehaviour
 
             if (tile.state != correctState && tile.state != incorrectState)
             {
-                if (remaining.Contains(tile.letter))
+                if (remaining.Contains(char.ToLower(tile.letter)))
                 {
                     tile.SetState(wrongState);
 
-                    int index = remaining.IndexOf(tile.letter);
+                    int index = remaining.IndexOf(char.ToLower(tile.letter));
                     remaining = remaining.Remove(index, 1);
                     remaining = remaining.Insert(index, " ");
                 }
@@ -191,7 +191,7 @@ public class Board : MonoBehaviour
     {
         for (int i = 0; i < validWords.Length; i++)
         {
-            if (validWords[i] == word)
+            if (word.ToLower() == validWords[i])
             {
                 return true;
             }
@@ -222,42 +222,6 @@ public class Board : MonoBehaviour
         newWordButton.gameObject.SetActive(true);
     }
 
-    public void OnLetterButtonClick(Button button) {
-
-        Row currentRow = rows[rowIndex];
-        currentRow.tiles[columnIndex].SetLetter((char) button.GetComponentInChildren<Text>().text[0]);
-
-
-        if (Input.GetKeyDown(KeyCode.Backspace))
-        {
-            columnIndex = Mathf.Max(columnIndex - 1, 0);
-            currentRow.tiles[columnIndex].SetLetter('\0');
-            currentRow.tiles[columnIndex].SetState(emptyState);
-
-            invalidWordText.gameObject.SetActive(false);
-        }
-        else if (columnIndex >= currentRow.tiles.Length) 
-        {
-            if (Input.GetKeyDown(KeyCode.Return))
-            {
-                SubmitRow(currentRow);
-            }
-        }
-        else
-        {
-            for (int i = 0; i < SUPPORTED_KEYS.Length; i++)
-            {
-                if (Input.GetKeyDown(SUPPORTED_KEYS[i]))
-                {
-                    currentRow.tiles[columnIndex].SetLetter((char)SUPPORTED_KEYS[i]);
-                    currentRow.tiles[columnIndex].SetState(occupiedState);
-                    columnIndex++;
-                    break;
-                }
-            }
-        }
-    }
-
     public void GetButtonClick(Button letterButtons)
     {
         Row currentRow = rows[rowIndex];
@@ -270,6 +234,13 @@ public class Board : MonoBehaviour
             currentRow.tiles[columnIndex].SetState(emptyState);
 
             invalidWordText.gameObject.SetActive(false);
+        }
+        else if (columnIndex >= currentRow.tiles.Length) 
+        {
+            if (buttonText == "===")
+            {
+                SubmitRow(currentRow);
+            }
         }
         else
         {
