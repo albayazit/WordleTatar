@@ -267,7 +267,7 @@ public class Board : MonoBehaviour
         Row currentRow = rows[rowIndex];
         string buttonText = letterButtons.GetComponentInChildren<TextMeshProUGUI>().text;
 
-        if (buttonText == "<<<") 
+        if (buttonText == "_") 
         {
             columnIndex = Mathf.Max(columnIndex - 1, 0);
             currentRow.tiles[columnIndex].SetLetter('\0');
@@ -277,7 +277,7 @@ public class Board : MonoBehaviour
         }
         else if (columnIndex >= currentRow.tiles.Length) 
         {
-            if (buttonText == "===")
+            if (buttonText == "")
             {
                 SubmitRow(currentRow);
             }
