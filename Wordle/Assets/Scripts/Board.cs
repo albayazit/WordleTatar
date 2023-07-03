@@ -88,33 +88,9 @@ public class Board : MonoBehaviour
     {
         Row currentRow = rows[rowIndex];
 
-        if (Input.GetKeyDown(KeyCode.Backspace))
+        if (columnIndex >= currentRow.tiles.Length) 
         {
-            columnIndex = Mathf.Max(columnIndex - 1, 0);
-            currentRow.tiles[columnIndex].SetLetter('\0');
-            currentRow.tiles[columnIndex].SetState(emptyState);
-
-            invalidWordText.gameObject.SetActive(false);
-        }
-        else if (columnIndex >= currentRow.tiles.Length) 
-        {
-            if (Input.GetKeyDown(KeyCode.Return))
-            {
-                SubmitRow(currentRow);
-            }
-        }
-        else
-        {
-            for (int i = 0; i < SUPPORTED_KEYS.Length; i++)
-            {
-                if (Input.GetKeyDown(SUPPORTED_KEYS[i]))
-                {
-                    currentRow.tiles[columnIndex].SetLetter((char)SUPPORTED_KEYS[i]);
-                    currentRow.tiles[columnIndex].SetState(occupiedState);
-                    columnIndex++;
-                    break;
-                }
-            }
+            SubmitRow(currentRow);
         }
     }
 
@@ -267,7 +243,7 @@ public class Board : MonoBehaviour
         Row currentRow = rows[rowIndex];
         string buttonText = letterButtons.GetComponentInChildren<TextMeshProUGUI>().text;
 
-        if (buttonText == "_") 
+        if (buttonText == "x") 
         {
             columnIndex = Mathf.Max(columnIndex - 1, 0);
             currentRow.tiles[columnIndex].SetLetter('\0');
@@ -277,7 +253,7 @@ public class Board : MonoBehaviour
         }
         else if (columnIndex >= currentRow.tiles.Length) 
         {
-            if (buttonText == "")
+            if (buttonText == "=")
             {
                 SubmitRow(currentRow);
             }
