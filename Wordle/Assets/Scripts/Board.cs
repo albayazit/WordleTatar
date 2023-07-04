@@ -22,8 +22,9 @@ public class Board : MonoBehaviour
 
     [Header("UI")]
     public TextMeshProUGUI invalidWordText;
-    public Button newWordButton;
-    public Button tryAgainButton;
+
+    public GameObject gameOver;
+    public GameObject gameWin;
 
     private Button letterButtons;
 
@@ -50,14 +51,16 @@ public class Board : MonoBehaviour
         ClearBoard();
         SetRandomWord();
 
-        enabled = true;
+        gameOver.gameObject.SetActive(false);
+        gameWin.gameObject.SetActive(false);
     }
 
     public void TryAgain() 
     {
         ClearBoard();
 
-        enabled = true;
+        gameOver.gameObject.SetActive(false);
+        gameWin.gameObject.SetActive(false);
     }
 
     private void SetRandomWord()
@@ -77,11 +80,14 @@ public class Board : MonoBehaviour
 
     private void Update()
     {
-        Row currentRow = rows[rowIndex];
-
-        if (columnIndex >= currentRow.tiles.Length) 
+        if (columnIndex < 7)
         {
-            SubmitRow(currentRow);
+            Row currentRow = rows[rowIndex];
+
+            if (columnIndex >= currentRow.tiles.Length) 
+            {
+                SubmitRow(currentRow);
+            }
         }
     }
 
@@ -136,7 +142,7 @@ public class Board : MonoBehaviour
         SetButtonColor(row);
         
         if (HasWon(row)) {
-            enabled = false; 
+            gameWin.gameObject.SetActive(true);
         }
 
         rowIndex++;
@@ -144,7 +150,8 @@ public class Board : MonoBehaviour
 
         if (rowIndex >= rows.Length)
         {
-            enabled = false;
+            gameOver.gameObject.SetActive(true);
+            rowIndex = 0;
         }
     }
 
@@ -215,18 +222,6 @@ public class Board : MonoBehaviour
             }
         }
         return true;
-    }
-
-    private void OnEnable() 
-    {
-        tryAgainButton.gameObject.SetActive(false);
-        newWordButton.gameObject.SetActive(false);
-    }
-
-    private void OnDisable() 
-    {
-        tryAgainButton.gameObject.SetActive(true);
-        newWordButton.gameObject.SetActive(true);
     }
 
     public void GetButtonClick(Button letterButtons)
