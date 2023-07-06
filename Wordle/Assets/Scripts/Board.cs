@@ -8,6 +8,7 @@ public class Board : MonoBehaviour
 
     private string[] solutions;
     private string[] validWords;
+    private string[] completed;
     private string word;
 
     private int rowIndex;
@@ -35,6 +36,11 @@ public class Board : MonoBehaviour
 
     public Button[] allButtons;
 
+    public TextMeshProUGUI translate;
+    public TextMeshProUGUI levelText;
+
+    private bool newTry;
+
     private void Awake() 
     {
         rows = GetComponentsInChildren<Row>();
@@ -48,9 +54,10 @@ public class Board : MonoBehaviour
 
     public void NewGame() 
     {
+        newTry = false;
         ClearBoard();
         SetRandomWord();
-
+        levelText.text = PlayerPrefs.GetInt("Completed", 0).ToString();
         gameOver.gameObject.SetActive(false);
         gameWin.gameObject.SetActive(false);
     }
@@ -58,7 +65,7 @@ public class Board : MonoBehaviour
     public void TryAgain() 
     {
         ClearBoard();
-
+        newTry = true;
         gameOver.gameObject.SetActive(false);
         gameWin.gameObject.SetActive(false);
     }
@@ -66,16 +73,15 @@ public class Board : MonoBehaviour
     private void SetRandomWord()
     {
         word = solutions[Random.Range(0, solutions.Length)];
-        word = word.ToLower().Trim();
+        translate.text = word;
+        word = word.ToLower().Trim().Substring(0, 5);
     }
 
     private void LoadData() 
     {
-        TextAsset textFile = Resources.Load("TatarWords/common") as TextAsset;
+        TextAsset textFile = Resources.Load("TatarWords/all_words") as TextAsset;
         validWords = textFile.text.Split('\n');
-
-        textFile = Resources.Load("TatarWords/common") as TextAsset;
-        solutions = textFile.text.Split('\n');
+        solutions = validWords;
     }
 
     private void Update()
@@ -89,6 +95,8 @@ public class Board : MonoBehaviour
                 SubmitRow(currentRow);
             }
         }
+        if(Input.GetKeyDown(KeyCode.D))
+            PlayerPrefs.DeleteAll();
     }
 
     private void SubmitRow(Row row)
@@ -143,6 +151,9 @@ public class Board : MonoBehaviour
         
         if (HasWon(row)) {
             gameWin.gameObject.SetActive(true);
+            if (newTry == false)
+                PlayerPrefs.SetInt("Completed", PlayerPrefs.GetInt("Completed", 0) + 1);
+            levelText.text = PlayerPrefs.GetInt("Completed", 0).ToString();
         }
 
         rowIndex++;
@@ -205,7 +216,7 @@ public class Board : MonoBehaviour
     {
         for (int i = 0; i < validWords.Length; i++)
         {
-            if (word.ToLower() == validWords[i])
+            if (word.ToLower() == validWords[i].Substring(0, 5))
             {
                 return true;
             }

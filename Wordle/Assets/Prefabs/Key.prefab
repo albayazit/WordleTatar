@@ -202,8 +202,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\u0419\n"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 5bdf9fab4db4f4a11a770828915fa64e, type: 2}
-  m_sharedMaterial: {fileID: 4220717134908604551, guid: 5bdf9fab4db4f4a11a770828915fa64e, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 3dab441888f644427899599b59fbfe78, type: 2}
+  m_sharedMaterial: {fileID: 7867333115327472693, guid: 3dab441888f644427899599b59fbfe78, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -235,7 +235,7 @@ MonoBehaviour:
   m_fontSizeMax: 72
   m_fontStyle: 16
   m_HorizontalAlignment: 2
-  m_VerticalAlignment: 512
+  m_VerticalAlignment: 4096
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0
