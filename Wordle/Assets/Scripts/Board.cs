@@ -1,9 +1,14 @@
 using TMPro;
 using UnityEngine.UI;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Board : MonoBehaviour
 {
+    public InterstitialAd ad;
+    public RewardedAd rewardedAd;
+    public GameObject noAds;
+
     private Row[] rows;
 
     private string[] solutions;
@@ -27,6 +32,7 @@ public class Board : MonoBehaviour
     public GameObject gameOver;
     public GameObject gameWin;
 
+
     private Button letterButtons;
 
     public Color defaultKeyColor;
@@ -39,7 +45,12 @@ public class Board : MonoBehaviour
     public TextMeshProUGUI translate;
     public TextMeshProUGUI levelText;
 
-    private bool newTry;
+    public GameObject winner;
+
+    private int complete;
+    private bool tryAgain;
+
+    public string level;
 
     private void Awake() 
     {
@@ -48,15 +59,19 @@ public class Board : MonoBehaviour
 
     private void Start() 
     {
+        level = SceneManager.GetActiveScene().name;
         LoadData();
         NewGame();
     }
 
     public void NewGame() 
     {
-        newTry = false;
+        noAds.SetActive(false);
+        winner.SetActive(false);
+        tryAgain = false;
         ClearBoard();
         SetRandomWord();
+        complete = 0;
         levelText.text = PlayerPrefs.GetInt("Completed", 0).ToString();
         gameOver.gameObject.SetActive(false);
         gameWin.gameObject.SetActive(false);
@@ -64,15 +79,21 @@ public class Board : MonoBehaviour
 
     public void TryAgain() 
     {
+        ad.ShowAd();
+        noAds.SetActive(false);
+        winner.SetActive(false);
+        tryAgain = true;
         ClearBoard();
-        newTry = true;
         gameOver.gameObject.SetActive(false);
         gameWin.gameObject.SetActive(false);
     }
 
     private void SetRandomWord()
     {
-        word = solutions[Random.Range(0, solutions.Length)];
+        if (PlayerPrefs.GetInt("Completed", 0) < 300)
+            word = solutions[PlayerPrefs.GetInt("Completed", 0)];
+        else
+            word = solutions[Random.Range(0, 300)];
         translate.text = word;
         word = word.ToLower().Trim().Substring(0, 5);
     }
@@ -81,7 +102,8 @@ public class Board : MonoBehaviour
     {
         TextAsset textFile = Resources.Load("TatarWords/all_words") as TextAsset;
         validWords = textFile.text.Split('\n');
-        solutions = validWords;
+        textFile = Resources.Load("TatarWords/solutions") as TextAsset;
+        solutions = textFile.text.Split('\n');
     }
 
     private void Update()
@@ -151,9 +173,13 @@ public class Board : MonoBehaviour
         
         if (HasWon(row)) {
             gameWin.gameObject.SetActive(true);
-            if (newTry == false)
+            complete += 1;
+            if (complete == 1) {
                 PlayerPrefs.SetInt("Completed", PlayerPrefs.GetInt("Completed", 0) + 1);
-            levelText.text = PlayerPrefs.GetInt("Completed", 0).ToString();
+                levelText.text = PlayerPrefs.GetInt("Completed", 0).ToString();
+                if (PlayerPrefs.GetInt("Completed", 0) == 300)
+                    winner.SetActive(true);
+            }
         }
 
         rowIndex++;
@@ -163,6 +189,15 @@ public class Board : MonoBehaviour
         {
             gameOver.gameObject.SetActive(true);
             rowIndex = 0;
+        }
+    }
+
+    public void WinGame() {
+        gameWin.gameObject.SetActive(true);
+        complete += 1;
+        if (complete == 1) {
+            PlayerPrefs.SetInt("Completed", PlayerPrefs.GetInt("Completed", 0) + 1);
+            levelText.text = PlayerPrefs.GetInt("Completed", 0).ToString();
         }
     }
 
@@ -179,7 +214,7 @@ public class Board : MonoBehaviour
                     {
                         allButtons[j].image.color = wrongKeyColor;
                     }
-                    else if (tile.state == incorrectState && allButtons[j].image.color != correctKeyColor)
+                    else if (tile.state == incorrectState && allButtons[j].image.color != correctKeyColor && allButtons[j].image.color != wrongKeyColor)
                     {
                         allButtons[j].image.color = incorrectKeyColor;
                     }
@@ -202,10 +237,15 @@ public class Board : MonoBehaviour
                 rows[row].tiles[col].SetState(emptyState);
             }
         }
-
         for (int j = 0; j < allButtons.Length; j++)
         {
-            allButtons[j].image.color = defaultKeyColor;
+            if (tryAgain && PlayerPrefs.GetInt("ADS") == 1) {
+                if (allButtons[j].image.color == correctKeyColor) {
+                    allButtons[j].image.color = wrongKeyColor;
+                }
+            } else {
+                allButtons[j].image.color = defaultKeyColor;
+            }
         }
 
         rowIndex = 0;
